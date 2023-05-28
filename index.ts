@@ -10,6 +10,9 @@ const spreadsheet1 = SpreadsheetApp.openById(PropertiesService.getScriptProperti
 const spreadsheet2 = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('SHEETKEY2') as string); //部活動シート
 const spreadsheet3 = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('SHEETKEY3') as string); //試験監督シート
 const folderId = PropertiesService.getScriptProperties().getProperty('FOLDERID') as string; // 画像フォルダのID
+const folderId2 = PropertiesService.getScriptProperties().getProperty('FOLDERID2') as string; // 画像フォルダのID
+const folderId3 = PropertiesService.getScriptProperties().getProperty('FOLDERID3') as string; // 画像フォルダのID
+
 
 // LINEからPOSTリクエストが渡されてきたときに実行される処理
 async function doPost(e: postEvent) {
@@ -98,6 +101,20 @@ async function doPost(e: postEvent) {
                     }
                 }
             }
+        } else if (user_message === "試験監督割") {
+            let folder = DriveApp.getFolderById(folderId3);
+            let files = folder.getFiles();
+            let fileUrl;
+            while (files.hasNext()) {
+                let file = files.next();
+                let fileId = file.getId();
+                fileUrl = "https://drive.google.com/uc?export=view&id=" + fileId;
+            }
+            if (fileUrl) {
+                lineReply(json, fileUrl, true);
+            } else {
+                lineReply(json, "画像がありません。", false);
+            }
         } else if (user_message.includes("試験監督")) {
             let target = user_message.split("　")[0];
             let name = getColumnDatas(spreadsheet3, "", 3, 3);
@@ -108,7 +125,7 @@ async function doPost(e: postEvent) {
             } else {
                 lineReply(json, "担当日がありません。", false);
             }
-        } else if (user_message.includes("欠席連絡")) {
+        } else if (user_message === "欠席連絡") {
             let folder = DriveApp.getFolderById(folderId);
             let files = folder.getFiles();
             let fileUrl;
@@ -122,8 +139,22 @@ async function doPost(e: postEvent) {
             } else {
                 lineReply(json, "画像がありません。", false);
             }
+        } else if (user_message === "特別時間割") {
+            let folder = DriveApp.getFolderById(folderId2);
+            let files = folder.getFiles();
+            let fileUrl;
+            while (files.hasNext()) {
+                let file = files.next();
+                let fileId = file.getId();
+                fileUrl = "https://drive.google.com/uc?export=view&id=" + fileId;
+            }
+            if (fileUrl) {
+                lineReply(json, fileUrl, true);
+            } else {
+                // lineReply(json, "画像がありません。", false);
+            }
         } else {
-            lineReply(json, "質問を正確に入力してください。", false);
+            // lineReply(json, "質問を正確に入力してください。", false);
         }
         // let messages = await chat(`${ json.events[0].source.userId }: user`, user_message);
     } catch (err) {
